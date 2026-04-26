@@ -116,7 +116,7 @@ final class ModelLoader {
                 personalKey: personalKey,
                 name: ModelConfig.YOLO.name,
                 version: ModelConfig.YOLO.version,
-                modelMode: .RUN_ACCURACY,
+                modelMode: .RUN_AUTO,
                 onDownload: { [weak self] progress in
                     Task { @MainActor in self?.yoloProgress = Double(progress) }
                 }
@@ -136,7 +136,7 @@ final class ModelLoader {
                 personalKey: personalKey,
                 name: ModelConfig.PlantClassifier.name,
                 version: ModelConfig.PlantClassifier.version,
-                modelMode: .RUN_ACCURACY,
+                modelMode: .RUN_AUTO,
                 onDownload: { [weak self] progress in
                     Task { @MainActor in self?.plantProgress = Double(progress) }
                 }

@@ -16,19 +16,22 @@ struct ModelLoadingView: View {
             VStack(spacing: 0) {
                 Spacer()
 
-                Image(UIStrings.checkitLogoAsset)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200)
+                VStack(spacing: 0) {
+                    Image(UIStrings.checkitLogoAsset)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 240)
 
-                Spacer().frame(height: itemSpacing)
+                    Spacer().frame(height: itemSpacing)
 
-                progressBar
-                    .frame(width: 266, height: 6)
+                    progressBar
+                        .frame(width: 266, height: 6)
 
-                Spacer().frame(height: itemSpacing)
+                    Spacer().frame(height: itemSpacing)
 
-                poweredBy
+                    poweredBy
+                }
+                .offset(y: -800)
 
                 Spacer()
 
@@ -63,12 +66,12 @@ struct ModelLoadingView: View {
     private var poweredBy: some View {
         HStack(spacing: 6) {
             Text(UIStrings.poweredByPrefix)
-                .font(.system(size: 13, weight: .regular))
+                .font(.system(size: 16, weight: .regular))
                 .foregroundStyle(UIConfig.inkGreen.opacity(0.7))
             Image(UIStrings.poweredByZeticAsset)
                 .resizable()
                 .scaledToFit()
-                .frame(height: 18)
+                        .frame(height: 22)
         }
     }
 }

@@ -76,8 +76,9 @@ struct ContentView: View {
         }
     }
 
-    /// Direction is fully determined by the new selection value: going to
-    /// `.prepare` is always forward (right), going to `.identify` is backward (left).
+    /// Pill moves right (→ Prepare) → pages move left, and vice versa.
+    /// Prepare enters from the right, Identify exits to the left — mirroring
+    /// opposite-direction scrolling so the two pages feel like one continuous surface.
     private var slideTransition: AnyTransition {
         let goingForward = (selection == .prepare)
         let edgeIn: Edge  = goingForward ? .trailing : .leading

@@ -2,12 +2,12 @@ import Foundation
 
 /// Every user-facing string. Localization is a future lift, not a refactor.
 enum UIStrings {
-    static let appTitle = "Campy"
-    static let welcomeWordmark = "Welcome to Campy"
+    static let appTitle = "Checkit"
+    static let welcomeWordmark = "Are you sure it's edible?"
     static let tapAndHoldToSpeak = "tap and hold to speak"
     static let noNetworkHoldMessage = "No network connection"
     static let poweredByPrefix = "Powered by "
-    static let betaDisclaimer = "Product in Beta testing, models could make mistakes. Use at your own risk."
+    static let betaDisclaimer = "Product is in beta testing, models could make mistakes.\nUse at your own risk."
 
     // Tabs
     static let identifyTabLabel = "Identify"

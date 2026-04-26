@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "destinationSlug": "angeles-national-forest",
+  "generatedAt": "2026-04-25T00:00:00Z",
+  "prepBlurb": "Angeles National Forest sits in chaparral, oak woodland, and high-elevation pine. Pack abundant water, sun protection, and long sleeves; ticks, poodle-dog bush, and poison oak are common along low-elevation trails. Forage only species you have positively identified, and avoid white sap, bitter taste, or unfamiliar berries.",
+  "entries": [
+    {
+      "scientificName": "Toxicodendron diversilobum",
+      "commonName": "Pacific poison oak",
+      "aliases": ["western poison oak"],
+      "category": "poisonous",
+      "rationale": "All parts contain urushiol oil, which causes a severe contact dermatitis. Smoke from burning plants is also toxic if inhaled.",
+      "prepNotes": "Avoid contact entirely. Wash exposed skin with cold soapy water within 30 minutes; launder clothing separately. Do not burn."
+    },
+    {
+      "scientificName": "Eriodictyon parryi",
+      "commonName": "Poodle-dog bush",
+      "aliases": ["turricula"],
+      "category": "poisonous",
+      "rationale": "Glandular hairs cause a delayed but severe contact dermatitis very similar to poison oak. Common in post-fire chaparral.",
+      "prepNotes": "Do not touch leaves, stems, or flowers. Stay on trail in burn-recovery areas; wash skin and gear after suspected contact."
+    },
+    {
+      "scientificName": "Datura wrightii",
+      "commonName": "Sacred datura",
+      "aliases": ["jimsonweed"],
+      "category": "poisonous",
+      "rationale": "All parts contain tropane alkaloids (atropine, scopolamine). Ingestion causes hallucinations, tachycardia, and can be fatal.",
+      "prepNotes": "Do not consume any part. Wash hands after handling."
+    },
+    {
+      "scientificName": "Heracleum maximum",
+      "commonName": "Cow parsnip",
+      "aliases": [],
+      "category": "poisonous",
+      "rationale": "Sap contains furanocoumarins that cause phytophotodermatitis — severe blistering when sun-exposed skin contacts the plant.",
+      "prepNotes": "Avoid skin contact. If exposed, wash immediately and keep skin out of sunlight for 48 hours."
+    },
+    {
+      "scientificName": "Ribes californicum",
+      "commonName": "California gooseberry",
+      "aliases": ["hillside gooseberry"],
+      "category": "edible",
+      "rationale": "Ripe purple berries are tart but edible. Spines on the fruit are removable and the flesh inside is safe for most people.",
+      "prepNotes": "Pick fully ripe (deep purple). Remove spines by rubbing with cloth or singeing briefly. Cook into jelly or eat fresh in moderation."
+    },
+    {
+      "scientificName": "Heteromeles arbutifolia",
+      "commonName": "Toyon",
+      "aliases": ["California holly", "Christmas berry"],
+      "category": "edible",
+      "rationale": "Ripe red berries are edible after cooking. Raw berries contain small amounts of cyanogenic glycosides.",
+      "prepNotes": "Always cook before eating — boiling, drying, or roasting destroys the toxins. Do not consume raw."
+    },
+    {
+      "scientificName": "Sambucus nigra ssp. caerulea",
+      "commonName": "Blue elderberry",
+      "aliases": ["mexican elderberry"],
+      "category": "edible",
+      "rationale": "Ripe blue berries with a glaucous bloom are edible when cooked; flowers are also edible. Raw berries, leaves, and stems contain cyanogenic compounds.",
+      "prepNotes": "Cook berries thoroughly into syrup, jam, or pie. Discard stems, leaves, and any green or red berries. Do not eat raw."
+    },
+    {
+      "scientificName": "Quercus agrifolia",
+      "commonName": "Coast live oak",
+      "aliases": [],
+      "category": "edible",
+      "rationale": "Acorns are edible after extensive leaching to remove tannins. Traditional staple food of indigenous Californians.",
+      "prepNotes": "Shell, grind, and leach acorn meal in repeated changes of cool water until no longer bitter. Use as flour or porridge."
+    },
+    {
+      "scientificName": "Yucca whipplei",
+      "commonName": "Chaparral yucca",
+      "aliases": ["our lord's candle"],
+      "category": "edible",
+      "rationale": "Flowers and young flower stalks are edible when cooked. The plant is iconic in low-elevation Angeles chaparral.",
+      "prepNotes": "Harvest flower buds before bloom; boil to remove bitterness. Avoid the sharp leaf tips when foraging."
+    },
+    {
+      "scientificName": "Adenostoma fasciculatum",
+      "commonName": "Chamise",
+      "aliases": ["greasewood"],
+      "category": "inedible",
+      "rationale": "Dominant chaparral shrub with no edible parts. Resinous foliage is highly flammable but not toxic.",
+      "prepNotes": "Use only for navigation or shelter context — not a food source."
+    },
+    {
+      "scientificName": "Artemisia californica",
+      "commonName": "California sagebrush",
+      "aliases": ["coastal sagebrush"],
+      "category": "inedible",
+      "rationale": "Strongly aromatic but extremely bitter; not a culinary herb. Traditional medicinal use only.",
+      "prepNotes": "Crush a leaf to confirm the strong sage scent for ID. Do not consume in quantity."
+    },
+    {
+      "scientificName": "Salvia apiana",
+      "commonName": "White sage",
+      "aliases": [],
+      "category": "inedible",
+      "rationale": "Aromatic native sage; leaves are not used as a culinary herb and over-harvesting is a conservation concern.",
+      "prepNotes": "Identification only. Do not harvest from public lands."
+    }
+  ]
+}

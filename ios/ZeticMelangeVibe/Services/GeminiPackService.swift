@@ -94,6 +94,7 @@ final class GeminiPackService: GeminiServiceProtocol, @unchecked Sendable {
         } catch GeminiError.quota {
             return CallOutcome(kind: .quota, latencyMs: Date().timeIntervalSince(start) * 1000)
         } catch {
+            print("[GeminiPackService] chatCall error: \(error)")
             return CallOutcome(kind: .quota, latencyMs: Date().timeIntervalSince(start) * 1000)
         }
     }
@@ -137,14 +138,17 @@ final class GeminiPackService: GeminiServiceProtocol, @unchecked Sendable {
     // MARK: Request bodies
 
     private func chatRequestBody(userTurn: String, history: [ModelReply]) -> [String: Any] {
-        var contents: [[String: Any]] = []
-        for reply in history {
-            contents.append(["role": "model", "parts": [["text": reply.text]]])
-        }
-        contents.append(["role": "user", "parts": [["text": userTurn]]])
+        // Gemini requires strictly alternating user/model turns starting with user.
+        // TranscriptStore only persists assistant replies (no user turns), so we
+        // cannot reconstruct valid multi-turn contents. We inject prior replies into
+        // the system instruction instead, which is safe and keeps full context.
+        let systemText = history.isEmpty
+            ? PromptConfig.geminiChatSystemPrompt
+            : PromptConfig.geminiChatSystemPrompt + Self.historyFootnote(history)
+
         return [
-            "system_instruction": ["parts": [["text": PromptConfig.geminiChatSystemPrompt]]],
-            "contents": contents,
+            "system_instruction": ["parts": [["text": systemText]]],
+            "contents": [["role": "user", "parts": [["text": userTurn]]]],
             "generationConfig": [
                 "temperature": 0.4,
                 "maxOutputTokens": 600
@@ -153,24 +157,31 @@ final class GeminiPackService: GeminiServiceProtocol, @unchecked Sendable {
     }
 
     private func packRequestBody(userTurn: String, history: [ModelReply], retryHint: String?) -> [String: Any] {
-        var contents: [[String: Any]] = []
-        for reply in history {
-            contents.append(["role": "model", "parts": [["text": reply.text]]])
-        }
+        let systemText = history.isEmpty
+            ? PromptConfig.geminiPackSystemPrompt
+            : PromptConfig.geminiPackSystemPrompt + Self.historyFootnote(history)
+
         var userText = userTurn
         if let retryHint, !retryHint.isEmpty {
             userText += "\n\n[previous JSON failed validation: \(retryHint)]"
         }
-        contents.append(["role": "user", "parts": [["text": userText.isEmpty ? "Update the pack." : userText]]])
         return [
-            "system_instruction": ["parts": [["text": PromptConfig.geminiPackSystemPrompt]]],
-            "contents": contents,
+            "system_instruction": ["parts": [["text": systemText]]],
+            "contents": [["role": "user", "parts": [["text": userText.isEmpty ? "Update the pack." : userText]]]],
             "generationConfig": [
                 "temperature": 0.2,
                 "responseMimeType": "application/json",
                 "responseSchema": PromptConfig.geminiPackResponseSchema
             ]
         ]
+    }
+
+    /// Appends prior assistant replies as a read-only conversation log in the
+    /// system instruction, capped to the most recent 6 to stay within token budget.
+    private static func historyFootnote(_ history: [ModelReply]) -> String {
+        let recent = history.suffix(6)
+        let lines = recent.map { "- \($0.text)" }.joined(separator: "\n")
+        return "\n\nPrior assistant replies (for context only):\n\(lines)"
     }
 
     // MARK: HTTP

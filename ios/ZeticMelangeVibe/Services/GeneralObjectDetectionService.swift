@@ -146,6 +146,7 @@ actor GeneralObjectDetectionService: ObjectDetectionServiceProtocol {
         let sorted = dets.sorted { $0.confidence > $1.confidence }
         var keep: [RawDetection] = []
         for candidate in sorted {
+            if keep.count >= AppConfig.maxDetectionsPerFrame { break }
             var rejected = false
             for already in keep {
                 if already.yoloClass == candidate.yoloClass &&

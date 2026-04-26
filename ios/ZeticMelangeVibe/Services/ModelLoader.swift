@@ -116,7 +116,7 @@ final class ModelLoader {
                 personalKey: personalKey,
                 name: ModelConfig.YOLO.name,
                 version: ModelConfig.YOLO.version,
-                modelMode: .RUN_AUTO,
+                modelMode: .RUN_SPEED,
                 onDownload: { [weak self] progress in
                     Task { @MainActor in self?.yoloProgress = Double(progress) }
                 }

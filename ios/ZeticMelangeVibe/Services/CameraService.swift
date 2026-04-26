@@ -41,7 +41,11 @@ final class CameraService: NSObject, CameraServiceProtocol, @unchecked Sendable 
         self.previewLayer = layer
 
         var capturedContinuation: AsyncStream<CameraFrame>.Continuation!
-        let stream = AsyncStream<CameraFrame> { c in
+        // Keep only the single newest frame in the buffer. YOLO inference takes
+        // ~150–300 ms; with unbounded buffering the consumer processes a growing
+        // backlog of stale frames. bufferingNewest(1) ensures the worker always
+        // gets the most recent frame the moment it becomes free.
+        let stream = AsyncStream<CameraFrame>(bufferingPolicy: .bufferingNewest(1)) { c in
             capturedContinuation = c
         }
         self.frames = stream
@@ -98,7 +102,9 @@ final class CameraService: NSObject, CameraServiceProtocol, @unchecked Sendable 
         if alreadyConfigured { return }
 
         session.beginConfiguration()
-        session.sessionPreset = .hd1920x1080
+        // 720p is more than enough for YOLO's 640×640 input and cuts pixel-data
+        // preprocessing time roughly in half versus the previous 1080p preset.
+        session.sessionPreset = .hd1280x720
 
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
            let input = try? AVCaptureDeviceInput(device: device),

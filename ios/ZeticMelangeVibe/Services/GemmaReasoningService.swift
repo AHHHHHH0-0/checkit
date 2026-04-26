@@ -57,23 +57,33 @@ final class GemmaReasoningService: GemmaReasoningServiceProtocol, @unchecked Sen
                 continuation.finish()
                 return
             }
-            inferenceQueue.async { [weak self] in
+            // Fetch the model on the MainActor *before* hopping to the inference
+            // queue. MainActor.assumeIsolated would crash on a background thread.
+            Task { @MainActor [weak self] in
                 guard let self else { continuation.finish(); return }
-                self.runOnce(prompt: prompt, cacheKey: cacheKey, continuation: continuation)
+#if canImport(ZeticMLange)
+                let model = self.modelLoader.gemma
+                self.inferenceQueue.async { [weak self] in
+                    guard let self else { continuation.finish(); return }
+                    self.runOnce(model: model, prompt: prompt, cacheKey: cacheKey, continuation: continuation)
+                }
+#else
+                continuation.finish()
+#endif
             }
         }
     }
 
-    private func runOnce(prompt: String, cacheKey: String, continuation: AsyncStream<String>.Continuation) {
 #if canImport(ZeticMLange)
-        let model: ZeticMLangeLLMModel? = MainActor.assumeIsolated { modelLoader.gemma }
+    private func runOnce(model: ZeticMLangeLLMModel?, prompt: String, cacheKey: String, continuation: AsyncStream<String>.Continuation) {
         guard let model else {
             continuation.finish()
             return
         }
         do {
-            try model.run(prompt)
+            _ = try model.run(prompt)
         } catch {
+            print("[GemmaReasoningService] run error: \(error)")
             continuation.finish()
             return
         }
@@ -87,10 +97,8 @@ final class GemmaReasoningService: GemmaReasoningServiceProtocol, @unchecked Sen
         cache(narrative: GemmaNarrative(key: cacheKey, paragraph: paragraph))
         try? model.cleanUp()
         continuation.finish()
-#else
-        continuation.finish()
-#endif
     }
+#endif
 }
 
 final class StubGemmaReasoningService: GemmaReasoningServiceProtocol, @unchecked Sendable {

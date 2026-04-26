@@ -28,11 +28,12 @@ actor WhisperTranscriberService: WhisperTranscriberServiceProtocol {
     func transcribe(audio: CapturedAudio) async -> String {
         let startedAt = Date()
 #if canImport(ZeticMLange)
-        guard let encoder = await modelLoader.whisperEncoder,
-              let decoder = await modelLoader.whisperDecoder,
-              let tokenizer = tokenizer else {
+        let enc = await modelLoader.whisperEncoder
+        let dec = await modelLoader.whisperDecoder
+        let tok = tokenizer
+        guard let encoder = enc, let decoder = dec, let tokenizer = tok else {
             #if DEBUG
-            logger.debug("missing whisper prerequisites encoder/decoder/tokenizer")
+            logger.debug("missing whisper prerequisites encoder=\(enc != nil, privacy: .public) decoder=\(dec != nil, privacy: .public) tokenizer=\(tok != nil, privacy: .public)")
             #endif
             return ""
         }

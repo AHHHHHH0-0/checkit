@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Minimal BPE tokenizer just sufficient for Whisper detokenization.
 ///
@@ -15,8 +16,22 @@ final class WhisperBPETokenizer: @unchecked Sendable {
     private let suppressIDs: Set<Int>
 
     static func loadFromBundle() -> WhisperBPETokenizer? {
-        guard let vocabURL = Bundle.main.url(forResource: ModelConfig.WhisperTokenizer.vocabResource, withExtension: "json"),
-              let vocabData = try? Data(contentsOf: vocabURL),
+        let log = Logger(subsystem: "CheckIt", category: "WhisperTokenizer")
+        let resource = ModelConfig.WhisperTokenizer.vocabResource
+        let vocabURL = Bundle.main.url(forResource: resource, withExtension: "json")
+        #if DEBUG
+        let urlPath = vocabURL?.path ?? "nil"
+        let found = vocabURL != nil
+        log.debug("loadFromBundle resource=\(resource, privacy: .public) found=\(found, privacy: .public) url=\(urlPath, privacy: .public)")
+        if vocabURL == nil {
+            let bundleContents = (try? FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath)) ?? []
+            let jsonFiles = bundleContents.filter { $0.hasSuffix(".json") }
+            let jsonFilesList = jsonFiles.joined(separator: ", ")
+            log.debug("bundle json files: \(jsonFilesList, privacy: .public)")
+        }
+        #endif
+        guard let url = vocabURL,
+              let vocabData = try? Data(contentsOf: url),
               let parsed = try? JSONSerialization.jsonObject(with: vocabData) as? [String: Int] else {
             return nil
         }

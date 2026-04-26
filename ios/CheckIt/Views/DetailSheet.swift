@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Full-screen card that animates in via a custom bloom from the tapped box's
 /// frame (paired with the `OverlayCanvas` `matchedGeometryEffect`). Streams a
@@ -13,6 +14,7 @@ struct DetailSheet: View {
 
     @Environment(\.appContainer) private var container
     @State private var paragraph: String = ""
+    @State private var isGenerating: Bool = false
     @State private var streamTask: Task<Void, Never>? = nil
     @State private var resolvedState: DetectionState
 
@@ -42,12 +44,12 @@ struct DetailSheet: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: UIConfig.Spacing.md) {
-                        Text(paragraph.isEmpty ? "  " : paragraph)
+                        Text(displayText)
                             .font(.system(size: 16, weight: .regular, design: .serif))
                             .foregroundStyle(UIConfig.inkGreen)
                             .multilineTextAlignment(.leading)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .opacity(paragraph.isEmpty ? 0.4 : 1)
+                            .opacity(paragraph.isEmpty && !isGenerating ? 0.4 : 1)
 
                         if let rationale = rationale {
                             Text(rationale)
@@ -62,7 +64,7 @@ struct DetailSheet: View {
 
                 dismissHint
             }
-            .padding(.top, UIConfig.Spacing.xl)
+            .padding(.top, windowSafeAreaTop + UIConfig.Spacing.lg)
             .padding(.bottom, UIConfig.Spacing.lg)
         }
         .contentShape(Rectangle())
@@ -179,7 +181,7 @@ struct DetailSheet: View {
                 return
             }
         } else {
-            print("[VisionPlantGate] no_frame_for_tap yolo_class=\(detection.yoloClass)")
+            print("[Gemma] no_frame_for_tap yolo_class=\(detection.yoloClass)")
             paragraph = UIStrings.plantUnsureRetry
             return
         }
@@ -188,35 +190,66 @@ struct DetailSheet: View {
 
         let cacheKey = self.cacheKey
         if let cached = container.gemma.cachedNarrative(forKey: cacheKey) {
+            print("[Gemma] cache_hit key=\(cacheKey)")
             paragraph = cached.paragraph
             return
         }
 
-        paragraph = ""
         streamTask?.cancel()
         let stream: AsyncStream<String>
         switch resolvedState {
         case .edible(let e), .inedible(let e), .poisonous(let e):
             let blurb = await container.plantKnowledge.currentPrepBlurb()
+            print("[Gemma] path=in_pack yolo_class=\(detection.yoloClass) scientific_name=\(e.scientificName) category=\(e.category.rawValue)")
             stream = container.gemma.narrate(plant: e, prepBlurb: blurb)
         case .notFound(let name):
+            print("[Gemma] path=not_found scientific_name=\(name)")
             stream = container.gemma.narrateNotFound(scientificName: name)
         case .notFood(let cls):
+            print("[Gemma] path=object yolo_class=\(cls)")
             stream = container.gemma.narrateObject(yoloClass: cls)
         default:
             return
         }
 
+        isGenerating = true
+        paragraph = ""
         streamTask = Task { @MainActor in
             var buffer = ""
             for await token in stream {
                 if Task.isCancelled { return }
                 buffer.append(token)
-                paragraph = buffer
             }
-            container.gemma.cache(narrative: GemmaNarrative(key: cacheKey, paragraph: buffer))
+            let cleaned = stripThinkingTags(buffer)
+            print("[Gemma] done key=\(cacheKey) raw=\(buffer.count)chars cleaned=\(cleaned.count)chars")
+            paragraph = cleaned
+            isGenerating = false
+            container.gemma.cache(narrative: GemmaNarrative(key: cacheKey, paragraph: cleaned))
         }
         await streamTask?.value
+    }
+
+    /// Strips `<think>…</think>` and `<thinking>…</thinking>` reasoning blocks
+    /// that Gemma may emit before its final answer.
+    private func stripThinkingTags(_ raw: String) -> String {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"<think(?:ing)?>\s*[\s\S]*?</think(?:ing)?>"#,
+            options: .caseInsensitive
+        ) else { return raw }
+        let range = NSRange(raw.startIndex..., in: raw)
+        let stripped = regex.stringByReplacingMatches(in: raw, range: range, withTemplate: "")
+        return stripped.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var displayText: String {
+        if isGenerating { return "give me a sec..." }
+        return paragraph.isEmpty ? "  " : paragraph
+    }
+
+    private var windowSafeAreaTop: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.keyWindow?.safeAreaInsets.top ?? 59
     }
 
     private var cacheKey: String {

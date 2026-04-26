@@ -4,7 +4,7 @@ import Foundation
 /// Edit values here — never inline magic numbers in services or views.
 enum AppConfig {
     // Detection / classification
-    static let detectionConfidenceThreshold: Float = 0.75
+    static let detectionConfidenceThreshold: Float = 0.85
     static let plantClassificationAcceptanceThreshold: Float = 0.30
     /// Hard cap on the number of boxes shown per frame (highest-confidence kept).
     static let maxDetectionsPerFrame: Int = 3
@@ -15,7 +15,7 @@ enum AppConfig {
     static let welcomeDurationSeconds: Double = 3.0
 
     // Gesture
-    static let holdMinimumDuration: Double = 0.5
+    static let holdMinimumDuration: Double = 0.3
     /// Sized to match `whisperWindowSeconds` exactly so there is never any chunking.
     static let holdHardCapSeconds: Double = 30.0
     static let tripleTapWindowSeconds: Double = 0.5

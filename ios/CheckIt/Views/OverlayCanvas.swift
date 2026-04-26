@@ -85,7 +85,7 @@ private struct BoundingBox: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(Capsule().fill(color))
-                    .offset(x: 6, y: -10)
+                    .offset(x: 6, y: 0)
             }
         }
     }
